@@ -1,5 +1,7 @@
-拼接 sql 查询  需要结合、gorm的  model.Raw(sql,sqlParams).Scan() 或者 Count()
-golang  mybatis plus  
+##偶尔需要 写sql拼接查询感觉麻烦就 花了一小时写了个工具 针对有的参数需要工具情况动态拼接 问题 结合 gorm 使用
+###拼接 sql 查询  需要结合、gorm的  model.Raw(sql,sqlParams).Scan() 或者 Count()
+#####golang  mybatis plus  
+```golang
 package snake
 
 import (
@@ -40,7 +42,6 @@ func TestPageAnd(t *testing.T) {
     */
 
 }
-
 func TestPageOr(t *testing.T) {
 
 	var status = 2
@@ -124,3 +125,4 @@ func TestPageOrAndOr(t *testing.T) {
 	*/
 
 }
+```
