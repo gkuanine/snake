@@ -1,4 +1,5 @@
 拼接 sql 查询  需要结合、gorm的  model.Raw(sql,sqlParams).Scan() 或者 Count()
+golang  mybatis plus  
 package snake
 
 import (
