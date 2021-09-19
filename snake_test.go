@@ -27,9 +27,7 @@ func TestPageAnd(t *testing.T) {
 	var sql = querySnake.GetSql()
 	var sqlParams = querySnake.GetSqlParams()
 	fmt.Println(sql)
-	for i := 0; i < len(sqlParams); i++ {
-		fmt.Println(sqlParams[i])
-	}
+	fmt.Println(sqlParams)
 	/**
 	select count(1) from table1 t1 left join table2  t2 on t2.id = t1.order_id where t1.title like ? and t2.user_id=? and t2.status=? order by t1.id desc limit 10 , 10
 	%nice%
@@ -61,9 +59,7 @@ func TestPageOr(t *testing.T) {
 	var sql = querySnake.GetSql()
 	var sqlParams = querySnake.GetSqlParams()
 	fmt.Println(sql)
-	for i := 0; i < len(sqlParams); i++ {
-		fmt.Println(sqlParams[i])
-	}
+	fmt.Println(sqlParams)
 	/**
 	select count(1) from table1 t1 left join table2  t2 on t2.id = t1.order_id where t2.user_id=? or t2.status=? order by t1.id desc limit 10 , 10
 	12
@@ -96,9 +92,7 @@ func TestPageOrAndOr(t *testing.T) {
 	var sql = querySnake.GetSql()
 	var sqlParams = querySnake.GetSqlParams()
 	fmt.Println(sql)
-	for i := 0; i < len(sqlParams); i++ {
-		fmt.Println(sqlParams[i])
-	}
+	fmt.Println(sqlParams)
 	/**
 	SELECT
 		count( 1 )
@@ -148,9 +142,7 @@ func TestPageAndOrOr(t *testing.T) {
 	var sql = querySnake.GetSql()
 	var sqlParams = querySnake.GetSqlParams()
 	fmt.Println(sql)
-	for i := 0; i < len(sqlParams); i++ {
-		fmt.Println(sqlParams[i])
-	}
+	fmt.Println(sqlParams)
 	/**
 	SELECT
 		count( 1 )
