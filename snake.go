@@ -43,7 +43,7 @@ func NewQuerySnake() *QuerySnake {
 	m := QuerySnake{}
 	return &m
 }
-func (p *QuerySnake) Field(fields ...string) *QuerySnake {
+func (p *QuerySnake) Select(fields ...string) *QuerySnake {
 	p.field = strings.Join(fields, ",")
 	return p
 }

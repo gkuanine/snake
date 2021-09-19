@@ -17,7 +17,7 @@ func TestPageAnd(t *testing.T) {
 		m["t2.status"] = status
 	}
 	m["t1.title like"] = "%" + keyword + "%"
-	var querySnake = NewQuerySnake().Field("count(1)").
+	var querySnake = NewQuerySnake().Select("count(1)").
 		Table("table1 t1").
 		LeftJoin("table2 "+" t2 on t2.id = t1.order_id").
 		Where(AND, m).Order("t1.id desc").
@@ -49,7 +49,7 @@ func TestPageOr(t *testing.T) {
 		m["t2.status"] = status
 	}
 
-	var querySnake = NewQuerySnake().Field("count(1)").
+	var querySnake = NewQuerySnake().Select("count(1)").
 		Table("table1 t1").
 		LeftJoin("table2 "+" t2 on t2.id = t1.order_id").
 		Where(OR, m).Order("t1.id desc").
@@ -82,7 +82,7 @@ func TestPageOrAndOr(t *testing.T) {
 		}
 		ms = append(ms, m)
 	}
-	var querySnake = NewQuerySnake().Field("count(1)").
+	var querySnake = NewQuerySnake().Select("count(1)").
 		Table("table1 t1").
 		LeftJoin("table2 "+" t2 on t2.id = t1.order_id").
 		Where(OR_AND_OR, ms...).Order("t1.id desc").
@@ -132,7 +132,7 @@ func TestPageAndOrOr(t *testing.T) {
 		}
 		ms = append(ms, m)
 	}
-	var querySnake = NewQuerySnake().Field("count(1)").
+	var querySnake = NewQuerySnake().Select("count(1)").
 		Table("table1 t1").
 		LeftJoin("table2 "+" t2 on t2.id = t1.order_id").
 		Where(AND_OR_OR, ms...).Order("t1.id desc").
