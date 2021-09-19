@@ -11,22 +11,23 @@ import (
 
 type NullType byte
 type WhereType byte
+
 const (
 	_ NullType = iota
 	// IsNull the same as `is null`
 	IsNull
 	// IsNotNull the same as `is not null`
 	IsNotNull
-	AND WhereType =iota
+	AND WhereType = iota
 	OR
 	OR_AND_OR
+	AND_OR_OR
 )
-
 
 type QuerySnake struct {
 	field      string
 	table      string
-	join       []string
+	leftJoin   []string
 	where      []map[string]interface{}
 	whereType  WhereType
 	groupBy    []string
@@ -52,14 +53,14 @@ func (p *QuerySnake) Table(table string) *QuerySnake {
 	return p
 }
 
-func (p *QuerySnake) LeftJoin(join ...string) *QuerySnake {
-	p.join = join
+func (p *QuerySnake) LeftJoin(leftJoin ...string) *QuerySnake {
+	p.leftJoin = leftJoin
 	return p
 }
 
-func (p *QuerySnake) Where(whereType WhereType,where ...map[string]interface{}) *QuerySnake {
+func (p *QuerySnake) Where(whereType WhereType, where ...map[string]interface{}) *QuerySnake {
 	p.where = where
-	p.whereType = whereType;
+	p.whereType = whereType
 	return p
 }
 
@@ -95,10 +96,10 @@ func (p *QuerySnake) BuildSql() *QuerySnake {
 	var sql = "select " +
 		p.field + " from " +
 		p.table
-	if len(p.join) > 0 {
+	if len(p.leftJoin) > 0 {
 		joinSql := ""
-		for i := 0; i < len(p.join); i++ {
-			joinSql = joinSql + " left join " + p.join[i]
+		for i := 0; i < len(p.leftJoin); i++ {
+			joinSql = joinSql + " left join " + p.leftJoin[i]
 		}
 		sql = sql + joinSql
 	}
@@ -108,11 +109,14 @@ func (p *QuerySnake) BuildSql() *QuerySnake {
 		var err error
 		switch p.whereType {
 		case AND:
-			whereSql,vals,err=p.buildAndWhere(p.where...)
+			whereSql, vals, err = p.buildAndWhere(p.where...)
 		case OR:
-			whereSql,vals,err=p.buildOrdWhere(p.where...)
+			whereSql, vals, err = p.buildOrdWhere(p.where...)
 		case OR_AND_OR:
-			whereSql,vals,err=p.buildComplexWhere(p.where...)
+			whereSql, vals, err = p.buildComplexWhere(p.where...)
+		case AND_OR_OR:
+			whereSql, vals, err = p.buildAndOrOrWhere(p.where...)
+
 		}
 		if err != nil {
 			panic("whereSql error ")
@@ -151,49 +155,71 @@ func (p *QuerySnake) BuildSql() *QuerySnake {
 
 	return p
 }
+
 //if len(andWhere)>1
 //  (or or or ) and (or or or ) ....
-func (p *QuerySnake)buildComplexWhere(complexWhere ...map[string]interface{}) (whereSQL string, vals []interface{}, err error) {
-	if len(complexWhere)==1{
+func (p *QuerySnake) buildComplexWhere(complexWhere ...map[string]interface{}) (whereSQL string, vals []interface{}, err error) {
+	if len(complexWhere) == 1 {
 		panic(" too simple to build whereSql")
 	}
 	var valss []interface{}
 	var whereSQLs []string
 	for i := 0; i < len(complexWhere); i++ {
 		var orWhere = complexWhere[i]
-		var whereSql=""
-		 whereSql,vals,err=p.buildOrdWhere(orWhere)
-		if err!=nil{
+		var whereSql = ""
+		whereSql, vals, err = p.buildOrdWhere(orWhere)
+		if err != nil {
 			panic("buildComplexWhere error ")
 		}
-		whereSQLs = append(whereSQLs,"("+whereSql+")")
-		valss = append(valss,vals...)
+		whereSQLs = append(whereSQLs, "("+whereSql+")")
+		valss = append(valss, vals...)
 	}
-	whereSQL=strings.Join(whereSQLs," and ")
-	return whereSQL,valss,err
+	whereSQL = strings.Join(whereSQLs, " and ")
+	return whereSQL, valss, err
 
 }
+
 //if len(andWhere)==1
 //and and and
 func (p *QuerySnake) buildAndWhere(andWhere ...map[string]interface{}) (whereSQL string, vals []interface{}, err error) {
-	if len(p.where)>1{
-			panic("whereSql error ")
+	if len(andWhere) > 1 {
+		panic("whereSql error ")
 	}
-	return p.buildAndOrWhere(andWhere[0],"and")
+	return p.buildAndOrWhere(andWhere[0], "and")
 
 }
+
 //if len(andWhere)==1
 // or or or
 func (p *QuerySnake) buildOrdWhere(andWhere ...map[string]interface{}) (whereSQL string, vals []interface{}, err error) {
-	if len(andWhere)>1{
+	if len(andWhere) > 1 {
 		panic("whereSql error ")
 	}
-	return p.buildAndOrWhere(andWhere[0],"or")
+	return p.buildAndOrWhere(andWhere[0], "or")
 }
 
+//where (t2.user_id=? and t2.status=?) AND (t2.status=? or t2.user_id=?) o
+func (p *QuerySnake) buildAndOrOrWhere(andWhere ...map[string]interface{}) (whereSQL string, vals []interface{}, err error) {
+	if len(andWhere) != 2 {
+		panic("buildAndOrOrWhere error ")
+	}
+	//var andWhereSql,andVals,err= p.buildAndOrWhere(andWhere[0],"or")
+	whereSQL, vals, err = p.buildAndWhere(andWhere[0])
+	if err != nil {
+		panic("buildAndOrOrWhere error")
+	}
+	whereSQL2, vals2, err2 := p.buildOrdWhere(andWhere[1])
+	if err2 != nil {
+		panic("buildAndOrOrWhere error")
+	}
+	whereSQL = whereSQL + " AND " + whereSQL2
+	vals = append(vals, vals2...)
+	return whereSQL, vals, nil
+
+}
 
 // sql build where
-func (p *QuerySnake) buildAndOrWhere(where map[string]interface{},andOr string) (whereSQL string, vals []interface{}, err error) {
+func (p *QuerySnake) buildAndOrWhere(where map[string]interface{}, andOr string) (whereSQL string, vals []interface{}, err error) {
 	for k, v := range where {
 		k = strings.Trim(k, " ")
 		ks := strings.Split(k, " ")
@@ -201,7 +227,7 @@ func (p *QuerySnake) buildAndOrWhere(where map[string]interface{},andOr string) 
 			return "", nil, fmt.Errorf("Error in query condition: %s. ", k)
 		}
 		if whereSQL != "" {
-			whereSQL += " "+andOr+" "
+			whereSQL += " " + andOr + " "
 		}
 		strings.Join(ks, ",")
 		switch len(ks) {
@@ -215,13 +241,13 @@ func (p *QuerySnake) buildAndOrWhere(where map[string]interface{},andOr string) 
 					whereSQL += fmt.Sprint(k, " IS NULL")
 				}
 			default:
-				t :=reflect.TypeOf(v)
+				t := reflect.TypeOf(v)
 				reflectType := fmt.Sprint(t)
-				switch reflectType{
+				switch reflectType {
 				case "string":
 					whereSQL += fmt.Sprint(k, "=?")
 					vals = append(vals, v)
-				case "uint","uint8", "uint16", "uint32", "uint64","int", "int8", "int16", "int32", "int64", "float32", "float64", "complex64", "complex128":
+				case "uint", "uint8", "uint16", "uint32", "uint64", "int", "int8", "int16", "int32", "int64", "float32", "float64", "complex64", "complex128":
 					whereSQL += fmt.Sprint(k, "=?")
 					vals = append(vals, v)
 				case "decimal.Decimal":
@@ -272,5 +298,6 @@ func (p *QuerySnake) buildAndOrWhere(where map[string]interface{},andOr string) 
 			break
 		}
 	}
+	whereSQL = "(" + whereSQL + ")"
 	return
 }
