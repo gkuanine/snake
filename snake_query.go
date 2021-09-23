@@ -20,8 +20,8 @@ const (
 	IsNotNull
 	AND WhereType = iota
 	OR
-	OR_AND_OR
-	AND_OR_OR
+	or_AND_or
+	and_AND_or
 )
 
 type QuerySnake struct {
@@ -112,9 +112,9 @@ func (p *QuerySnake) BuildSql() *QuerySnake {
 			whereSql, vals, err = p.buildAndWhere(p.where...)
 		case OR:
 			whereSql, vals, err = p.buildOrdWhere(p.where...)
-		case OR_AND_OR:
+		case or_AND_or:
 			whereSql, vals, err = p.buildComplexWhere(p.where...)
-		case AND_OR_OR:
+		case and_AND_or:
 			whereSql, vals, err = p.buildAndOrOrWhere(p.where...)
 
 		}
