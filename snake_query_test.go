@@ -101,8 +101,8 @@ func TestPage_or_And_or(t *testing.T) {
 		LEFT JOIN table2 t2 ON t2.id = t1.order_id
 	WHERE
 		( t2.user_id =? Linker_OR t2.STATUS =? )
-		Linker_AND ( t2.user_id =? Linker_OR t2.STATUS =? )
-		Linker_AND ( t2.user_id =? Linker_OR t2.STATUS =? )
+		AND ( t2.user_id =? Linker_OR t2.STATUS =? )
+		AND ( t2.user_id =? Linker_OR t2.STATUS =? )
 	ORDER BY
 		t1.id DESC
 		LIMIT 10,
@@ -150,9 +150,9 @@ func TestPage_and_AND_or(t *testing.T) {
 		table1 t1
 		LEFT JOIN table2 t2 ON t2.id = t1.order_id
 	WHERE
-		( t2.user_id =? Linker_OR t2.STATUS =? )
-		Linker_AND ( t2.user_id =? Linker_OR t2.STATUS =? )
-		Linker_AND ( t2.user_id =? Linker_OR t2.STATUS =? )
+		( t2.user_id =?  OR t2.STATUS =? )
+		 AND ( t2.user_id =?  OR t2.STATUS =? )
+		 AND ( t2.user_id =?  OR t2.STATUS =? )
 	ORDER BY
 		t1.id DESC
 		LIMIT 10,

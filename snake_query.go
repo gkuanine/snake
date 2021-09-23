@@ -198,7 +198,7 @@ func (p *QuerySnake) buildOrdWhere(andWhere ...map[string]interface{}) (whereSQL
 	return p.buildAndOrWhere(andWhere[0], "or")
 }
 
-//where (t2.user_id=? and t2.status=?) Linker_AND (t2.status=? or t2.user_id=?) o
+//where (t2.user_id=? and t2.status=?) AND (t2.status=? or t2.user_id=?) o
 func (p *QuerySnake) buildAndOrOrWhere(andWhere ...map[string]interface{}) (whereSQL string, vals []interface{}, err error) {
 	if len(andWhere) != 2 {
 		panic("buildAndOrOrWhere error ")
@@ -212,7 +212,7 @@ func (p *QuerySnake) buildAndOrOrWhere(andWhere ...map[string]interface{}) (wher
 	if err2 != nil {
 		panic("buildAndOrOrWhere error")
 	}
-	whereSQL = whereSQL + " Linker_AND " + whereSQL2
+	whereSQL = whereSQL + "  AND " + whereSQL2
 	vals = append(vals, vals2...)
 	return whereSQL, vals, nil
 
