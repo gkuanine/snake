@@ -18,10 +18,10 @@ const (
 	IsNull
 	// IsNotNull the same as `is not null`
 	IsNotNull
-	AND WhereType = iota
-	OR
-	or_AND_or
-	and_AND_or
+	Linker_AND WhereType = iota
+	Linker_OR
+	Linker_or_AND_or
+	Linker_and_AND_or
 )
 
 type QuerySnake struct {
@@ -108,13 +108,13 @@ func (p *QuerySnake) BuildSql() *QuerySnake {
 		var vals []interface{}
 		var err error
 		switch p.whereType {
-		case AND:
+		case Linker_AND:
 			whereSql, vals, err = p.buildAndWhere(p.where...)
-		case OR:
+		case Linker_OR:
 			whereSql, vals, err = p.buildOrdWhere(p.where...)
-		case or_AND_or:
+		case Linker_or_AND_or:
 			whereSql, vals, err = p.buildComplexWhere(p.where...)
-		case and_AND_or:
+		case Linker_and_AND_or:
 			whereSql, vals, err = p.buildAndOrOrWhere(p.where...)
 
 		}
@@ -198,7 +198,7 @@ func (p *QuerySnake) buildOrdWhere(andWhere ...map[string]interface{}) (whereSQL
 	return p.buildAndOrWhere(andWhere[0], "or")
 }
 
-//where (t2.user_id=? and t2.status=?) AND (t2.status=? or t2.user_id=?) o
+//where (t2.user_id=? and t2.status=?) Linker_AND (t2.status=? or t2.user_id=?) o
 func (p *QuerySnake) buildAndOrOrWhere(andWhere ...map[string]interface{}) (whereSQL string, vals []interface{}, err error) {
 	if len(andWhere) != 2 {
 		panic("buildAndOrOrWhere error ")
@@ -212,7 +212,7 @@ func (p *QuerySnake) buildAndOrOrWhere(andWhere ...map[string]interface{}) (wher
 	if err2 != nil {
 		panic("buildAndOrOrWhere error")
 	}
-	whereSQL = whereSQL + " AND " + whereSQL2
+	whereSQL = whereSQL + " Linker_AND " + whereSQL2
 	vals = append(vals, vals2...)
 	return whereSQL, vals, nil
 
