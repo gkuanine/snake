@@ -67,7 +67,7 @@ func TestPageOr(t *testing.T) {
 	*/
 
 }
-func TestPageOrAndOr(t *testing.T) {
+func TestPage_or_And_or(t *testing.T) {
 
 	var status = 2
 
@@ -117,7 +117,7 @@ func TestPageOrAndOr(t *testing.T) {
 
 }
 
-func TestPageAndOrOr(t *testing.T) {
+func TestPage_and_AND_or(t *testing.T) {
 
 	var status = 2
 
@@ -165,27 +165,4 @@ func TestPageAndOrOr(t *testing.T) {
 	2
 	*/
 
-}
-
-func TestPageAndOrTest(t *testing.T) {
-	//select
-	//	xrp.`currency_pair` as curr,
-	//	count(xrp.`amount`) as 总笔数,
-	//	sum(xrp.`amount`) as 交易币总量,
-	//	sum(xrp.price*xrp.`amount`) as 计价币总量
-	//	from finished_orders xrp
-	//	where xrp.`created_at` >= '2021-09-18 00:00:00'
-	//	and xrp.`created_at` <= '2021-09-19 00:00:00'
-	//	group by xrp.`currency_pair`;
-	var m = make(map[string]interface{})
-	m["xrp.created_at >="] = "2021-09-18 00:00:00"
-	m["xrp.created_at <="] = "2021-09-19 00:00:00"
-	querySnake := NewQuerySnake().Select("xrp.`currency_pair` as curr", "count(xrp.`amount`) as 总笔数",
-		"sum(xrp.`amount`) as 交易币总量", "sum(xrp.price*xrp.`amount`) as 计价币总量").Table("finished_orders xrp").
-		Where(AND, m).GroupBy("xrp.currency_pair").BuildSql()
-	var sql = querySnake.GetSql()
-	var sqlParams = querySnake.GetSqlParams()
-	fmt.Println(sql)
-	fmt.Println(sqlParams)
-	//model.DB.Raw(sql,sqlParams...).Scan(&dataList)
 }
