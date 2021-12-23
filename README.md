@@ -125,4 +125,80 @@ func TestPageOrAndOr(t *testing.T) {
 	*/
 
 }
+
+
+
+
+
+
+and or 连用
+
+ 
+		var andMap = make(map[string]interface{})
+	andMap["t1.shop_id"] = admin.ShopId
+	if skuId != 0 {
+		andMap["t1.sku_id"] = skuId
+	}
+	if goodsId != 0 {
+		andMap["t1.goods_id"] = goodsId
+	}
+	
+	var orMap = make(map[string]interface{})
+	orMap["t2.goods_sn"] = code
+	orMap["t2.barcode"] = code
+	
+	var query= snake.NewQuerySnake().Table(global.MallBatch().TableName()+" t1").Select("*").
+		LeftJoin(global.MallSku().TableName()+" t2 on t2.id = t1.sku_id").
+		Where(snake.Linker_and_AND_or, andMap, orMap).Limit(pageSize).Offset(pageSize * (pageNumber - 1)).
+		Order("t1.stock desc,t1.sku_id desc,t1.goods_id desc, t1.updated_at desc,t1.id desc").BuildSql()
+			
+var dataList []model.MallBatchDTO
+	model.DB.Raw(query.GetSql(), query.GetSqlParams()...).Scan(&dataList)
+	var total int64
+	query.Select("count(1)").BuildSql()
+	model.DB.Raw(query.GetSql(), query.GetSqlParams()...).Count(&total)
+
+
+
+
+多left join 
+
+	var admin adminmodel.AdminDTO
+	var orMap = make(map[string]interface{})
+	orMap["phone"] = username
+	orMap["email"] = username
+	var query = snake.NewQuerySnake().Select("t1.*,t3.name as role_name").
+		Table(global.Admin().TableName()+" t1").
+		LeftJoin(global.AdminUserRole().TableName()+" t2 on t2.admin_id = t1.id ", global.AdminRole().TableName()+" t3 on t3.id = 			t2.role_id").Where(snake.Linker_OR, orMap).BuildSql()
+	model.DB.Raw(query.GetSql(), query.GetSqlParams()...).Find(&admin)
+	if admin.ID == 0 {
+		global.Error("登录帐号不存在") 
+	}
+	if admin.Status == 1 {
+		global.Error("帐号禁用") 
+	}
+	
+	
+	
+	
+and or like 
+	var andM = make(map[string]interface{})
+	andM["t2.user_id"] = userId
+	if status != 0 {
+		andM["t2.status"] = status
+	}
+	var orM = make(map[string]interface{})
+	if !strs.IsEmpty(keyword) {
+		orM["t1.title like"] = "%" + keyword + "%"
+		orM["t2.order_no like"] = "%" + keyword + "%"
+	}
+	
+		var  querySnake = snake.NewQuerySnake().Select("count(1)").
+			Table(global.MallOrderGoods().TableName()+" t1").
+			LeftJoin(global.MallOrder().TableName()+" t2 on t2.id = t1.order_id").
+			Where(snake.Linker_and_AND_or, andM, orM).Order("t2.updated_at desc,t1.id desc").
+			Limit(pageSize).
+			Offset(pageSize * (pageNumber - 1)).
+			BuildSql()
+			
 ```
