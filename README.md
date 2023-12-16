@@ -202,3 +202,4 @@ and or like
 			BuildSql()
 			
 ```
+go get github.com/gkuanine/snake@v0.00.07
