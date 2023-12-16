@@ -10,7 +10,7 @@ func TestPageAnd(t *testing.T) {
 	var status = 2
 	var keyword = "nice"
 	var pageSize int = 10
-	var pageNumber int = 2
+	var pageNumber int = 3
 	var m = make(map[string]interface{})
 	m["t2.user_id"] = userId
 	if status != 0 {

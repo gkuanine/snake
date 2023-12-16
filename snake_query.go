@@ -146,10 +146,14 @@ func (p *QuerySnake) BuildSql() *QuerySnake {
 		sql = sql + " order by " + orderSql
 	}
 	if p.limit > 0 {
-		sql = sql + " limit " + fmt.Sprint(p.limit)
+		sql = sql + " limit "
+		var offsetStr = ""
 		if p.offset >= 0 {
-			sql = sql + " , " + fmt.Sprint(p.offset)
+			offsetStr = fmt.Sprint(p.offset)
+		} else {
+			offsetStr = fmt.Sprint(0)
 		}
+		sql = sql + offsetStr + "," + fmt.Sprint(p.limit)
 	}
 	p.lastSql = sql
 
