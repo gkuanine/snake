@@ -33,8 +33,8 @@ type QuerySnake struct {
 	groupBy    []string
 	having     []string
 	order      []string
-	limit      int64
-	offset     int64
+	limit      int
+	offset     int
 	lastSql    string
 	lastParams []interface{}
 }
@@ -76,11 +76,11 @@ func (p *QuerySnake) Order(order ...string) *QuerySnake {
 	p.order = order
 	return p
 }
-func (p *QuerySnake) Limit(limit int64) *QuerySnake {
+func (p *QuerySnake) Limit(limit int) *QuerySnake {
 	p.limit = limit
 	return p
 }
-func (p *QuerySnake) Offset(offset int64) *QuerySnake {
+func (p *QuerySnake) Offset(offset int) *QuerySnake {
 	p.offset = offset
 	return p
 }
@@ -91,7 +91,7 @@ func (p *QuerySnake) GetSqlParams() []interface{} {
 	return p.lastParams
 }
 
-//select join where、group by、having、order by
+// select join where、group by、having、order by
 func (p *QuerySnake) BuildSql() *QuerySnake {
 	var sql = "select " +
 		p.field + " from " +
@@ -146,18 +146,19 @@ func (p *QuerySnake) BuildSql() *QuerySnake {
 		sql = sql + " order by " + orderSql
 	}
 	if p.limit > 0 {
-		sql = sql + " limit " + fmt.Sprint(p.limit)
 		if p.offset > 0 {
 			sql = sql + " , " + fmt.Sprint(p.offset)
 		}
+		sql = sql + " limit " + fmt.Sprint(p.limit)
 	}
 	p.lastSql = sql
 
 	return p
 }
 
-//if len(andWhere)>1
-//  (or or or ) and (or or or ) ....
+// if len(andWhere)>1
+//
+//	(or or or ) and (or or or ) ....
 func (p *QuerySnake) buildComplexWhere(complexWhere ...map[string]interface{}) (whereSQL string, vals []interface{}, err error) {
 	if len(complexWhere) == 1 {
 		panic(" too simple to build whereSql")
@@ -179,8 +180,8 @@ func (p *QuerySnake) buildComplexWhere(complexWhere ...map[string]interface{}) (
 
 }
 
-//if len(andWhere)==1
-//and and and
+// if len(andWhere)==1
+// and and and
 func (p *QuerySnake) buildAndWhere(andWhere ...map[string]interface{}) (whereSQL string, vals []interface{}, err error) {
 	if len(andWhere) > 1 {
 		panic("whereSql error ")
@@ -189,7 +190,7 @@ func (p *QuerySnake) buildAndWhere(andWhere ...map[string]interface{}) (whereSQL
 
 }
 
-//if len(andWhere)==1
+// if len(andWhere)==1
 // or or or
 func (p *QuerySnake) buildOrdWhere(andWhere ...map[string]interface{}) (whereSQL string, vals []interface{}, err error) {
 	if len(andWhere) > 1 {
@@ -198,7 +199,7 @@ func (p *QuerySnake) buildOrdWhere(andWhere ...map[string]interface{}) (whereSQL
 	return p.buildAndOrWhere(andWhere[0], "or")
 }
 
-//where (t2.user_id=? and t2.status=?) AND (t2.status=? or t2.user_id=?) o
+// where (t2.user_id=? and t2.status=?) AND (t2.status=? or t2.user_id=?) o
 func (p *QuerySnake) buildAndOrOrWhere(andWhere ...map[string]interface{}) (whereSQL string, vals []interface{}, err error) {
 	if len(andWhere) != 2 {
 		panic("buildAndOrOrWhere error ")

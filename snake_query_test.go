@@ -9,8 +9,8 @@ func TestPageAnd(t *testing.T) {
 	var userId = 1
 	var status = 2
 	var keyword = "nice"
-	var pageSize int64 = 10
-	var pageNumber int64 = 2
+	var pageSize int = 10
+	var pageNumber int = 2
 	var m = make(map[string]interface{})
 	m["t2.user_id"] = userId
 	if status != 0 {
@@ -40,8 +40,8 @@ func TestPageAnd(t *testing.T) {
 func TestPageOr(t *testing.T) {
 
 	var status = 2
-	var pageSize int64 = 10
-	var pageNumber int64 = 2
+	var pageSize int = 10
+	var pageNumber int = 2
 
 	var m = make(map[string]interface{})
 	m["t2.user_id"] = 12
@@ -71,8 +71,8 @@ func TestPage_or_And_or(t *testing.T) {
 
 	var status = 2
 
-	var pageSize int64 = 10
-	var pageNumber int64 = 2
+	var pageSize int = 10
+	var pageNumber int = 2
 	var ms []map[string]interface{}
 	for i := 0; i < 3; i++ {
 		var m = make(map[string]interface{})
@@ -121,8 +121,8 @@ func TestPage_and_AND_or(t *testing.T) {
 
 	var status = 2
 
-	var pageSize int64 = 10
-	var pageNumber int64 = 2
+	var pageSize int = 10
+	var pageNumber int = 2
 	var ms []map[string]interface{}
 	for i := 0; i < 2; i++ {
 		var m = make(map[string]interface{})
